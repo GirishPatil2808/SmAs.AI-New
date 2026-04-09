@@ -30,7 +30,7 @@ The backend is containerized for easy deployment. On your EC2 instance:
 
 ```bash
 # Clone the repository
-git clone [https://github.com/utkarsh0p/chrome-rag-extension.git](https://github.com/utkarsh0p/chrome-rag-extension.git)
+git clone https://github.com/GirishPatil2808/SmAs.AI-New.git
 cd chrome-rag-extension/backend
 
 # Build the Docker image

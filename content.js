@@ -107,3 +107,140 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
   return true;
 });
+
+// ── FLOATING WIDGET UI ─────────────────────────────────────────────
+
+(function initSmAsWidget() {
+  if (document.querySelector('#smas-widget')) return;
+
+  // Floating button
+  const button = document.createElement("div");
+  button.id = "smas-widget";
+  button.innerHTML = "Ask AI";
+
+  Object.assign(button.style, {
+    position: "fixed",
+    bottom: "20px",
+    right: "20px",
+    width: "90px",
+    height: "40px",
+    background: "#000",              // black
+    color: "#4CAF50",               // green text
+    borderRadius: "20px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    fontSize: "14px",
+    cursor: "pointer",
+    zIndex: "999999",
+    border: "1px solid #4CAF50",    // green border
+    boxShadow: "0 4px 12px rgba(0,0,0,0.5)"
+  });
+
+  document.body.appendChild(button);
+
+  document.addEventListener("click", async (e) => {
+    if (e.target.id === "send-btn") {
+      const input = document.getElementById("chat-input");
+      const msgBox = document.getElementById("chat-messages");
+  
+      const query = input.value.trim();
+      if (!query) return;
+  
+      // Show user message
+      msgBox.innerHTML += `<div style="text-align:right;">${query}</div>`;
+      input.value = "";
+  
+      // Get page data
+      const rawText = document.body.innerText;
+      const cleanedText = rawText.replace(/[\n\t]+/g, ' ').trim();
+  
+      // Call backend (same as popup.js)
+      const response = await fetch("https://chrome-rag-extension.onrender.com/rag", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Token": "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",   // ⚠️ IMPORTANT
+          "Provider": "openai"
+        },
+        body: JSON.stringify({
+          query: query,
+          chunks: [cleanedText]
+        })
+      });
+  
+      const data = await response.text();
+  
+      // Show AI response
+      msgBox.innerHTML += `<div style="text-align:left;">🤖 ${data}</div>`;
+      msgBox.scrollTop = msgBox.scrollHeight;
+    }
+  });
+
+  // Chat box
+  const chatBox = document.createElement("div");
+  chatBox.id = "smas-chat";
+
+  Object.assign(chatBox.style, {
+    position: "fixed",
+    bottom: "90px",
+    right: "20px",
+    width: "340px",
+    height: "450px",
+    background: "#111",              // dark background
+    border: "1px solid #333",
+    borderRadius: "12px",
+    display: "none",
+    flexDirection: "column",
+    zIndex: "999999",
+    boxShadow: "0 8px 25px rgba(0,0,0,0.6)",
+    color: "#fff"
+  });
+
+  chatBox.innerHTML = `
+  <div style="padding:12px; background:#000; color:#4CAF50; font-weight:bold;">
+    Ask AI
+  </div>
+
+  <div id="chat-messages" style="flex:1; padding:10px; overflow:auto;"></div>
+
+  <div style="display:flex;">
+  <input id="chat-input" placeholder="Ask AI..." 
+    style="flex:1; padding:10px; border:none;" />
+  <button id="send-btn" style="padding:10px; background:#4CAF50; color:#fff; border:none;">
+    Ask
+  </button>
+</div>
+`;
+
+  document.body.appendChild(chatBox);
+
+  // Toggle
+  button.onclick = () => {
+    chatBox.style.display =
+      chatBox.style.display === "none" ? "flex" : "none";
+  };
+
+  const input = document.getElementById("chat-input");
+const messagesDiv = document.getElementById("chat-messages");
+
+input.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && input.value.trim()) {
+
+    const query = input.value.trim();
+
+    messagesDiv.innerHTML += `<div><b>You:</b> ${query}</div>`;
+    input.value = "";
+
+    chrome.runtime.sendMessage(
+      { 
+        type: "ASK_AI",//https://leetcode.com/problemset/
+        query: query,
+        mode: "rag", // later we can switch modes
+        pageText: document.body.innerText
+      },
+    );
+  }
+});
+
+})();

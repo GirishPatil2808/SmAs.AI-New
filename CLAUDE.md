@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**SiteWhisper** — a Chrome extension (Manifest v3, plain JS/HTML/CSS, no build step) that lets users chat with any webpage using AI. The extension scrapes and chunks page text, sends it to a Flask backend on AWS EC2, which does semantic search + LLM inference and returns an answer.
+**SmAsAI** — a Chrome extension (Manifest v3, plain JS/HTML/CSS, no build step) that lets users chat with any webpage using AI. The extension scrapes and chunks page text, sends it to a Flask backend on AWS EC2, which does semantic search + LLM inference and returns an answer.
 
 Supports four AI providers: **Claude, Gemini, OpenAI, HuggingFace**. The user picks a provider and API key once (options page), then selects a specific model per session from the popup.
 
@@ -149,7 +149,7 @@ Top-3 chunks selected by cosine similarity (scikit-learn). Claude uses TF-IDF fa
 
 ## Branding
 
-- **Extension name**: SiteWhisper
+- **Extension name**: SmAsAI
 - **Logo**: geometric X-chevron (left) + D-arc with radial spokes (right) + starburst at intersection. Source: `icons/logo.svg`. The inner "track" effect (double-stroke) is the defining visual.
 - **Popup style**: Perplexity-inspired — compact on open (header + input only, ~130px), chat body hidden via `display:none`, gains `.visible` class (→ `display:flex`) on first message sent.
 - **Options style**: 4 provider rows (vertical list), each always-visible key input, "Saved" green badge shown if key exists (but input is never pre-filled). Save button saves all non-empty inputs and merges into `apiKeys`. Auto-closes 800ms after save.

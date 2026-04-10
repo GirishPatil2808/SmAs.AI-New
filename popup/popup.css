@@ -407,7 +407,7 @@ body {
 }
 
 /* Inside RAG answerBody */
-.answer-body.whispering-rag {
+.answer-body.ering-rag {
   display: flex;
   align-items: center;
   gap: 7px;

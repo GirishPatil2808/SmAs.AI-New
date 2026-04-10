@@ -419,7 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
         {
           icon: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12h2l3-8 4 16 3-10 2 4 2-2h4"/></svg>`,
           label: 'Whisper Modes',
-          sub: selectedMode === 'rag' ? 'WhisperRAG active' : 'WhisperChat active',
+          sub: selectedMode === 'rag' ? 'SmAsRAG active' : 'SmAsChat active',
           action: () => showOverlay('whisper-modes', 'menu'),
           disabled: false,
         },
@@ -459,19 +459,19 @@ document.addEventListener('DOMContentLoaded', () => {
         {
           key: 'rag',
           icon: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4.03 3 9 3s9-1.34 9-3"/></svg>`,
-          label: 'WhisperRAG',
+          label: 'SmAsRAG',
           sub: "Chat with this page's content using semantic search",
         },
         {
           key: 'chat',
           icon: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`,
-          label: 'WhisperChat',
+          label: 'SmAsChat',
           sub: 'Chat directly with AI — no page context',
         },
         {
           key: 'code',
           icon: `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>`,
-          label: 'WhisperCode',
+          label: 'SmAsCode',
           sub: 'Solve & inject code — LeetCode / coding sites',
         },
       ];

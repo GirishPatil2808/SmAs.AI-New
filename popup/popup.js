@@ -128,9 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentStreamEl = null;
 
   const LANGUAGES = [
-    'Python3','Python','Java','C++','C','C#',
-    'JavaScript','TypeScript','Go','Kotlin','Swift',
-    'Rust','Ruby','PHP','Dart','Scala','Racket','Erlang','Elixir',
+    'Python3','Java','C++','C',
   ];
   let selectedLanguage = 'Python3';
 

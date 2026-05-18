@@ -107,3 +107,139 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
   return true;
 });
+
+
+// ================= FLOATING WIDGET =================
+
+if (!document.getElementById("smartassist-widget")) {
+
+  const widget = document.createElement("div");
+  widget.id = "smartassist-widget";
+
+  widget.innerHTML = `
+    <div id="smartassist-button">Ask AI</div>
+
+    <div id="smartassist-panel" class="hidden">
+      <div id="smartassist-header">
+        <span>SmartAssist.AI</span>
+        <button id="smartassist-close">×</button>
+      </div>
+
+      <iframe src="${chrome.runtime.getURL("popup/popup.html")}"></iframe>
+    </div>
+  `;
+
+  document.body.appendChild(widget);
+
+  // ---------- Styles ----------
+  const style = document.createElement("style");
+
+  style.textContent = `
+    #smartassist-widget {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 999999;
+      font-family: sans-serif;
+    }
+
+    #smartassist-button {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: black;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      font-weight: bold;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+      user-select: none;
+    }
+
+    #smartassist-panel {
+      width: 500px;
+      height: 320px;
+      background: white;
+      border-radius: 18px;
+      overflow: hidden;
+      position: absolute;
+      bottom: 80px;
+      right: 0;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+    }
+
+    #smartassist-panel.hidden {
+      display: none;
+    }
+
+    #smartassist-header {
+      height: 52px;
+      background: black;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 2px 10px 10px;
+    }
+
+    #smartassist-header button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    #smartassist-panel iframe {
+      width: 100%;
+      height: calc(100% - 52px);
+      border: none;
+    }
+  `;
+
+  document.head.appendChild(style);
+
+  const button = document.getElementById("smartassist-button");
+  const panel = document.getElementById("smartassist-panel");
+  const closeBtn = document.getElementById("smartassist-close");
+
+  // ---------- Open / Close ----------
+  button.addEventListener("click", () => {
+    panel.classList.toggle("hidden");
+  });
+
+  closeBtn.addEventListener("click", () => {
+    panel.classList.add("hidden");
+  });
+
+  // ---------- Dragging ----------
+  let isDragging = false;
+  let offsetX = 0;
+  let offsetY = 0;
+
+  button.addEventListener("mousedown", (e) => {
+    isDragging = true;
+
+    offsetX = e.clientX - widget.offsetLeft;
+    offsetY = e.clientY - widget.offsetTop;
+
+    button.style.cursor = "grabbing";
+  });
+
+  document.addEventListener("mousemove", (e) => {
+    if (!isDragging) return;
+
+    widget.style.left = `${e.clientX - offsetX}px`;
+    widget.style.top = `${e.clientY - offsetY}px`;
+
+    widget.style.right = "auto";
+    widget.style.bottom = "auto";
+  });
+
+  document.addEventListener("mouseup", () => {
+    isDragging = false;
+    button.style.cursor = "grab";
+  });
+}

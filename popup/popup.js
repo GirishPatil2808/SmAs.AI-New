@@ -644,7 +644,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!key) { showError('No API key for this provider. Open Settings (⚙).'); return; }
 
         const isChat = selectedMode === 'chat';
-        const url    = isChat ? 'https://chrome-rag-extension.onrender.com/chat' : 'https://chrome-rag-extension.onrender.com/rag';
+        const url = isChat ? 'http://127.0.0.1:8000/chat' : 'http://127.0.0.1:8000/rag';
         const body   = isChat
           ? { query, model: selectedModel?.id, provider: selectedProvider, history: chatMessages.slice(0, -1) }
           : { query, chunks, model: selectedModel?.id, provider: selectedProvider };
@@ -765,7 +765,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           let response;
           try {
-            response = await fetch('https://chrome-rag-extension.onrender.com/code', {
+            response = await fetch('http://127.0.0.1:8000/code', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'Token': key, 'Provider': selectedProvider },
               body: JSON.stringify({

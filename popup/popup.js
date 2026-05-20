@@ -89,8 +89,8 @@ const PROVIDER_ORDER = ['claude', 'gemini', 'openai', 'huggingface'];
 
 const MODELS = {
   openai: [
-    { id: 'gpt-4.1-mini', label: 'GPT-4.1 mini' },
-    { id: 'gpt-4.1',      label: 'GPT-4.1'      },
+    { id: 'gpt-5-mini', label: 'GPT-5mini' },
+    { id: 'gpt-5',      label: 'GPT-5'      },
     { id: 'o4-mini',      label: 'o4-mini'       },
   ],
   gemini: [
@@ -123,6 +123,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const chatHistory     = document.getElementById('chatHistory');
   const langSelector    = document.getElementById('langSelector');
   const codeInjectBtn   = document.getElementById('codeInjectBtn');
+  const fileUpload      = document.getElementById('fileUpload');
+  const fileName        = document.getElementById('fileName');
+
+  let uploadedFile = null;
+
+  function updateSendButton() {
+    askBtn.disabled =
+      !input.value.trim() &&
+      !uploadedFile &&
+      selectedMode !== 'code';
+  }
 
   let chatMessages    = [];   // [{ role, content }] — in-memory only
   let currentStreamEl = null;
@@ -149,6 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let selectedModel    = null;
   let savedApiKeys     = {};
   let selectedMode     = 'rag'; // 'rag' | 'chat'
+  
 
   // ── Load saved keys ───────────────────────────────────────────────────────
 
@@ -199,16 +211,26 @@ document.addEventListener('DOMContentLoaded', () => {
     input.placeholder = placeholders[selectedMode] || placeholders.rag;
 
     // Toggle code mode class on shell for CSS to hide/show textarea vs lang selector
+    
     const shell = document.querySelector('.popup-shell');
+    const fileUploadRow = document.querySelector('.file-upload-row');
     if (selectedMode === 'code') {
       shell.classList.add('mode-code');
       askBtn.disabled = false;
       renderLangGrid();
     } else {
       shell.classList.remove('mode-code');
-      askBtn.disabled = !input.value.trim();
+      
+    }
+    // SHOW upload only in chat mode
+    if (selectedMode === 'chat') {
+      fileUploadRow.style.display = 'flex';
+    } else {
+      fileUploadRow.style.display = 'none';
     }
   }
+
+  updateSendButton();
 
   function renderLangGrid() {
     langSelector.innerHTML = `
@@ -296,6 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   settingsBtn.addEventListener('click', () => showOverlay('menu'));
 
+  
   // ── State helpers ─────────────────────────────────────────────────────────
 
   function showThinking() {
@@ -592,7 +615,18 @@ document.addEventListener('DOMContentLoaded', () => {
   input.addEventListener('input', () => {
     input.style.height = 'auto';
     input.style.height = Math.min(input.scrollHeight, 130) + 'px';
-    askBtn.disabled = !input.value.trim();
+  
+    updateSendButton();
+  });
+
+  fileUpload.addEventListener('change', (e) => {
+    uploadedFile = e.target.files[0] || null;
+  
+    fileName.textContent = uploadedFile
+      ? uploadedFile.name
+      : '';
+  
+    updateSendButton();
   });
 
   input.addEventListener('keydown', (e) => {
@@ -605,8 +639,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Send ──────────────────────────────────────────────────────────────────
 
   askBtn.addEventListener('click', async () => {
-    const query = selectedMode === 'code' ? '' : input.value.trim();
-    if (!query && selectedMode !== 'code') return;
+    const query = input.value.trim();
+
+    if (!query && !uploadedFile && selectedMode !== 'code') return;
 
     if (!selectedProvider) {
       showError('No provider set. Open Settings (⚙) to add an API key.');
@@ -643,32 +678,62 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const isChat = selectedMode === 'chat';
         const url = isChat ? 'http://127.0.0.1:8000/chat' : 'http://127.0.0.1:8000/rag';
-        const body   = isChat
-          ? { query, model: selectedModel?.id, provider: selectedProvider, history: chatMessages.slice(0, -1) }
-          : { query, chunks, model: selectedModel?.id, provider: selectedProvider };
-
+        
         let response;
+
         try {
-          response = await fetch(url, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Token':    key,
-              'Provider': selectedProvider,
-            },
-            body: JSON.stringify(body),
-          });
+
+          // ── CHAT MODE WITH FILE UPLOAD ─────────────────────
+
+          if (isChat) {
+
+            const formData = new FormData();
+
+            formData.append("query", query);
+            formData.append("model", selectedModel?.id || "");
+            formData.append("history", JSON.stringify(chatMessages));
+
+            if (uploadedFile) {
+              formData.append("file", uploadedFile);
+            }
+
+            response = await fetch(url, {
+              method: 'POST',
+              headers: {
+                'Token': key,
+                'Provider': selectedProvider,
+              },
+              body: formData,
+            });
+
+          }
+
+          // ── NORMAL RAG MODE ────────────────────────────────
+
+          else {
+
+            response = await fetch(url, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Token': key,
+                'Provider': selectedProvider,
+              },
+
+              body: JSON.stringify({
+                query,
+                chunks,
+                model: selectedModel?.id,
+                provider: selectedProvider,
+              }),
+            });
+
+          }
+
         } catch (err) {
           showError('Could not reach backend: ' + err.message);
           return;
         }
-
-        if (!response.ok) {
-          try { const d = await response.json(); showError(d.detail || 'Backend error.'); }
-          catch { showError('Backend error ' + response.status); }
-          return;
-        }
-
         const reader  = response.body.getReader();
         const decoder = new TextDecoder();
         let fullText = '';
@@ -685,7 +750,21 @@ document.addEventListener('DOMContentLoaded', () => {
             for (const line of lines) {
               if (!line.startsWith('data: ')) continue;
               const raw = line.slice(6).trim();
-              if (raw === '[DONE]') return;
+              if (raw === '[DONE]') {
+                uploadedFile = null;
+              
+                if (fileUpload) {
+                  fileUpload.value = '';
+                }
+              
+                if (fileName) {
+                  fileName.textContent = '';
+                }
+              
+                updateSendButton();
+              
+                return;
+              }
               try {
                 const parsed = JSON.parse(raw);
                 if (parsed.error) { showError(parsed.error); return; }

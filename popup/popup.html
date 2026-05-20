@@ -55,6 +55,22 @@
           rows="1"
         ></textarea>
 
+        <!-- File Upload -->
+        <div class="file-upload-row">
+          <label for="fileUpload" class="file-upload-btn">
+            📎 Upload PDF/Image
+          </label>
+
+          <input
+            type="file"
+            id="fileUpload"
+            accept=".pdf,image/*"
+            hidden
+          />
+
+          <span id="fileName" class="file-name"></span>
+        </div>
+
         <!-- Code mode: language picker (shown instead of textarea) -->
         <div class="lang-selector" id="langSelector"></div>
 

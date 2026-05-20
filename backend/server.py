@@ -3,6 +3,9 @@ import json
 from functools import lru_cache
 from typing import Optional
 
+from fastapi import UploadFile, File, Form
+from pypdf import PdfReader
+from io import BytesIO
 from fastapi import FastAPI, Header, HTTPException
 from fastapi.concurrency import run_in_threadpool
 from fastapi.middleware.cors import CORSMiddleware
@@ -91,6 +94,21 @@ def extract_chunk(chunk) -> str:
         return c if isinstance(c, str) else ""
     return ""
 
+def extract_text_from_pdf(file_bytes: bytes) -> str:
+    try:
+        pdf = PdfReader(BytesIO(file_bytes))
+        text = ""
+
+        for page in pdf.pages:
+            page_text = page.extract_text()
+
+            if page_text:
+                text += page_text + "\n"
+
+        return text.strip()
+
+    except Exception:
+        return ""
 
 # ── Request models ─────────────────────────────────────────────────────────────
 
@@ -128,7 +146,7 @@ async def rag(
 
     try:
         if provider == "openai":
-            model_id       = body.model or "gpt-4.1-mini"
+            model_id       = body.model or "gpt-5-mini"
             llm, embedding = get_openai_clients(token, model_id)
             context        = await run_in_threadpool(get_top_chunks, query, chunks, embedding)
 
@@ -207,7 +225,7 @@ async def code(
 
     try:
         if provider == "openai":
-            model_id = body.model or "gpt-4.1-mini"
+            model_id = body.model or "gpt-5-mini"
             llm, _   = get_openai_clients(token, model_id)
         elif provider == "gemini":
             model_id = body.model or "gemini-2.5-flash"
@@ -264,64 +282,99 @@ async def code(
 
 @app.post("/chat")
 async def chat(
-    body: ChatRequest,
-    token: str    = Header(..., alias="Token"),
+    query: str = Form(""),
+    model: Optional[str] = Form(None),
+    history: Optional[str] = Form(None),
+
+    file: UploadFile | None = File(None),
+
+    token: str = Header(..., alias="Token"),
     provider: str = Header("huggingface", alias="Provider"),
 ):
-    token    = token.strip()
+    token = token.strip()
     provider = provider.lower()
 
     if not token:
-        raise HTTPException(status_code=400, detail="No API key provided. Open Settings and add your key.")
+        raise HTTPException(status_code=400, detail="No API key provided.")
+
+    uploaded_text = ""
+
+    parsed_history = []
+
+    if history:
+        try:
+            parsed_history = json.loads(history)
+        except Exception:
+            parsed_history = []
+
+    # ── PDF Upload Support ─────────────────────────
+
+    if file:
+        try:
+            file_bytes = await file.read()
+
+            if file.filename.lower().endswith(".pdf"):
+                uploaded_text = extract_text_from_pdf(file_bytes)
+
+        except Exception:
+            uploaded_text = ""
 
     try:
         if provider == "openai":
-            model_id = body.model or "gpt-4.1-mini"
-            llm, _   = get_openai_clients(token, model_id)
+            model_id = model or "gpt-5-mini"
+            llm, _ = get_openai_clients(token, model_id)
 
         elif provider == "gemini":
-            model_id = body.model or "gemini-2.5-flash"
-            llm, _   = get_gemini_clients(token, model_id)
+            model_id = model or "gemini-2.5-flash"
+            llm, _ = get_gemini_clients(token, model_id)
 
         elif provider == "claude":
-            model_id = body.model or "claude-haiku-4-5"
-            llm      = get_claude_client(token, model_id)
+            model_id = model or "claude-haiku-4-5"
+            llm = get_claude_client(token, model_id)
 
-        else:  # huggingface
-            model_id = body.model or "meta-llama/Llama-3.1-8B-Instruct"
-            llm, _   = get_hf_clients(token, model_id)
+        else:
+            model_id = model or "meta-llama/Llama-3.1-8B-Instruct"
+            llm, _ = get_hf_clients(token, model_id)
 
     except Exception as e:
-        msg = str(e)
-        if any(k in msg.lower() for k in ("api key", "apikey", "authentication", "unauthorized", "invalid")):
-            raise HTTPException(status_code=401, detail=f"Invalid API key for {provider}. Check your key in Settings.")
-        raise HTTPException(status_code=500, detail=f"Server error ({provider}): {msg}")
+        raise HTTPException(status_code=500, detail=str(e))
 
-    # Build message list with optional history
-    from langchain_core.messages import HumanMessage, AIMessage
-    messages = []
-    for h in (body.history or []):
-        if h.get("role") == "user":
-            messages.append(HumanMessage(content=h["content"]))
-        elif h.get("role") == "assistant":
-            messages.append(AIMessage(content=h["content"]))
-    messages.append(HumanMessage(content=body.query))
+    # ── Build Prompt ───────────────────────────────
+
+    conversation = ""
+
+    for msg in parsed_history[-10:]:
+        role = msg.get("role", "user")
+        content = msg.get("content", "")
+
+        conversation += f"{role.upper()}: {content}\n"
+
+    if query.strip():
+        conversation += f"USER: {query}"
+    else:
+        conversation += "USER: Summarize this uploaded document."
+
+    if uploaded_text.strip():
+        final_prompt = (
+            f"You are analyzing an uploaded document.\n\n"
+            f"Document Content:\n{uploaded_text}\n\n"
+            f"Conversation:\n{conversation}"
+        )
+    else:
+        final_prompt = conversation
 
     async def generate():
         try:
             async with asyncio.timeout(LLM_TIMEOUT):
-                async for chunk in llm.astream(messages):
+                async for chunk in llm.astream(final_prompt):
                     text = extract_chunk(chunk)
+
                     if text:
                         yield f"data: {json.dumps({'text': text})}\n\n"
-        except TimeoutError:
-            yield f"data: {json.dumps({'error': f'LLM did not respond within {LLM_TIMEOUT}s. Try again.'})}\n\n"
+
         except Exception as e:
-            msg = str(e)
-            if any(k in msg.lower() for k in ("api key", "apikey", "authentication", "unauthorized", "invalid")):
-                yield f"data: {json.dumps({'error': f'Invalid API key for {provider}. Check your key in Settings.'})}\n\n"
-            else:
-                yield f"data: {json.dumps({'error': f'Stream error ({provider}): {msg}'})}\n\n"
+            yield f"data: {json.dumps({'error': str(e)})}\n\n"
+
         finally:
             yield "data: [DONE]\n\n"
 

@@ -21,6 +21,32 @@ const TYPING_SVG = `<svg class="dots-anim" width="28" height="12" viewBox="0 0 2
 
 // ── Markdown renderer ─────────────────────────────────────────────────────────
 
+let allChats = JSON.parse(localStorage.getItem('sitewhisper-chats')) || [];
+
+let currentChatId = null;
+
+function createNewChat() {
+  currentChatId = Date.now();
+
+  const newChat = {
+    id: currentChatId,
+    title: "New Chat",
+    messages: []
+  };
+
+  allChats.unshift(newChat);
+
+  localStorage.setItem(
+    'sitewhisper-chats',
+    JSON.stringify(allChats)
+  );
+
+  chatMessages = [];
+  chatHistory.innerHTML = '';
+
+  responseArea.classList.remove('visible');
+}
+
 function renderMarkdown(md) {
   const esc    = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   const inline = s => s
@@ -421,6 +447,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const overlayClose = document.getElementById('overlayClose');
   const overlayBack  = document.getElementById('overlayBack');
 
+  const newChatBtn = document.getElementById('newChatBtn');
+
+  newChatBtn.addEventListener('click', () => {
+    createNewChat();
+});
+
   function showOverlay(mode, prevMode = null) {
     overlayList.innerHTML = '';
     overlayBack.style.display = prevMode ? 'flex' : 'none';
@@ -517,14 +549,7 @@ document.addEventListener('DOMContentLoaded', () => {
           renderModeBtn();
           updatePlaceholder();
           // Clear all output on mode change
-          responseArea.classList.remove('visible');
-          chatHistory.innerHTML = '';
-          chatHistory.classList.remove('visible');
-          answerSection.classList.remove('visible');
-          answerBody.className = 'answer-body';
-          answerBody.innerHTML = '';
-          codeInjectBtn.style.display = 'none';
-          chatMessages = [];
+          createNewChat();
           hideOverlay();
         });
         overlayList.appendChild(btn);

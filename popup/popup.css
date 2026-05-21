@@ -48,7 +48,7 @@ body {
   font-size: 17px;
   font-weight: 700;
   letter-spacing: -0.3px;
-  color: #1a1a1a;
+  color: #7a62fe;
 }
 
 .settings-btn {
@@ -96,7 +96,7 @@ body {
   font-size: 16px;
   font-family: 'Inter', system-ui, sans-serif;
   font-weight: 400;
-  color: #1a1a1a;
+  color: #7a62fe;
   outline: none;
   overflow-y: auto;
   line-height: 1.5;
@@ -139,7 +139,7 @@ body {
 .lang-btn:hover { background: #f0f0ec; }
 
 .lang-btn.active {
-  background: #1a1a1a;
+  background: #7a62fe;
   border-color: #1a1a1a;
   color: #fafaf8;
 }
@@ -284,7 +284,7 @@ body {
 .overlay-title {
   font-size: 14px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: #7a62fe;
   font-family: 'Inter', sans-serif;
 }
 
@@ -320,7 +320,7 @@ body {
   font-family: 'Inter', sans-serif;
   font-size: 13.5px;
   font-weight: 450;
-  color: #1a1a1a;
+  color: #7a62fe;
   background: none;
   border: none;
   width: 100%;
@@ -350,7 +350,7 @@ body {
   width: 13px; height: 13px;
   flex-shrink: 0;
   opacity: 0;
-  color: #1a1a1a;
+  color: #7a62fe;
 }
 .ov-option.active .ov-check { opacity: 1; }
 
@@ -364,7 +364,7 @@ body {
   flex-shrink: 0;
   border: none;
   border-radius: 50%;
-  background: #1a1a1a;
+  background: #7a62fe;
   color: #fafaf8;
   cursor: pointer;
   transition: opacity 0.15s, transform 0.1s;
@@ -440,7 +440,7 @@ body {
   padding: 4px 12px;
   border: none;
   border-radius: 7px;
-  background: #1a1a1a;
+  background: #7a62fe;
   color: #fafaf8;
   font-family: 'Inter', sans-serif;
   font-size: 12px;
@@ -458,7 +458,7 @@ body {
 .answer-body {
   font-size: 15px;
   line-height: 1.7;
-  color: #2a2a28;
+  color: #7a62fe;
   max-height: 220px;
   overflow-y: auto;
   padding-right: 4px;
@@ -551,7 +551,7 @@ body {
   justify-content: center;
   flex-shrink: 0;
 }
-.ai-av   { background: #1a1a1a; }
+.ai-av   { background: #7a62fe; }
 .user-av { background: #e8e8e4; color: #666660; }
 
 .chat-bubble {
@@ -563,11 +563,11 @@ body {
 }
 .ai-bubble {
   background: #efefeb;
-  color: #1a1a1a;
+  color: #7a62fe;
   border-radius: 14px 14px 14px 4px;
 }
 .user-bubble {
-  background: #1a1a1a;
+  background: #7a62fe;
   color: #fafaf8;
   border-radius: 14px 14px 4px 14px;
   white-space: pre-wrap;
@@ -712,4 +712,19 @@ body {
   border-radius: 5px;
   padding: 2px 7px;
   flex-shrink: 0;
+}
+.new-chat-btn {
+  border: none;
+  background: #7a62fe;
+  color: white;
+  padding: 7px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.new-chat-btn:hover {
+  opacity: 0.85;
 }

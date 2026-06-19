@@ -728,3 +728,56 @@ body {
 .new-chat-btn:hover {
   opacity: 0.85;
 }
+
+.privacy-popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+
+
+.privacy-box {
+
+  width:260px;
+  background:#fafaf8;
+  border-radius:16px;
+  padding:20px;
+  text-align:center;
+  box-shadow:0 10px 30px rgba(0,0,0,0.2);
+
+}
+
+
+.privacy-title{
+
+font-weight:700;
+font-size:16px;
+margin-bottom:10px;
+
+}
+
+
+.privacy-box p{
+
+font-size:13px;
+line-height:1.5;
+color:#555;
+
+}
+
+
+#privacyOk{
+
+margin-top:15px;
+background:#1a1a1a;
+color:white;
+border:none;
+padding:8px 20px;
+border-radius:10px;
+cursor:pointer;
+
+}

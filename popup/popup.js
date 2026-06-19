@@ -950,3 +950,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+const privacyPopup = document.getElementById("privacyPopup");
+const privacyOk = document.getElementById("privacyOk");
+
+
+privacyOk.addEventListener("click",()=>{
+
+privacyPopup.style.display="none";
+
+});

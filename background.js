@@ -9,7 +9,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // ==========================
   if (message.type === "CHAT_QUERY") {
 
-    fetch("http://localhost:5000/chat", {
+    fetch("http://smas-ai.onrender.com/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -37,7 +37,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // ==========================
   if (message.type === "RAG_QUERY") {
 
-    fetch("http://localhost:5000/query", {
+    fetch("http://smas-ai.onrender.com/query", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -66,7 +66,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // ==========================
   if (message.type === "CODE_QUERY") {
 
-    fetch("http://localhost:5000/chat", {
+    fetch("http://smas-ai.onrender.com/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -96,7 +96,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // ==========================
   if (message.type === "RAG_INGEST") {
 
-    fetch("http://localhost:5000/ingest", {
+    fetch("http://smas-ai.onrender.com/ingest", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

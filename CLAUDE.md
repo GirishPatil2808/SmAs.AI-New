@@ -52,7 +52,7 @@ content.js — scrapes document.body.innerText, collapses whitespace,
 popup.js — builds payload { query, chunks, model }
   ↓ chrome.runtime.sendMessage({ type: "ASK_BACKEND", payload })
 background.js — reads apiProvider + apiKey from chrome.storage.local,
-                POSTs to http://smas-ai.onrender.com/chat
+                POSTs to https://smas-ai.onrender.com/chat
                 with headers: Token, Provider, Content-Type
   ↓ fetch response
 backend/server.py — embeds chunks, cosine similarity → top 3,

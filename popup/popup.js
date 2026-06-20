@@ -702,7 +702,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!key) { showError('No API key for this provider. Open Settings (⚙).'); return; }
 
         const isChat = selectedMode === 'chat';
-        const url = isChat ? 'http://smas-ai.onrender.com/chat' : 'http://smas-ai.onrender.com/rag';
+        const url = isChat ? 'https://smas-ai.onrender.com/chat' : 'https://smas-ai.onrender.com/rag';
         
         let response;
 

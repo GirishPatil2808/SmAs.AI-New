@@ -20,7 +20,7 @@
 
   "host_permissions": [
     "<all_urls>",
-    "http://smas-ai.onrender.com/*"
+    "https://smas-ai.onrender.com/*"
   ],
 
   "action": {

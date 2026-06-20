@@ -1,5 +1,5 @@
 chrome.runtime.onInstalled.addListener(() => {
-  console.log("SiteWhisper Installed");
+  console.log("SmAs-AI Installed");
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -9,7 +9,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // ==========================
   if (message.type === "CHAT_QUERY") {
 
-    fetch("https://smas-ai.onrender.com/chat", {
+    fetch("https://smas-ai-mk3u.onrender.com/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -37,7 +37,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // ==========================
   if (message.type === "RAG_QUERY") {
 
-    fetch("https://smas-ai.onrender.com/query", {
+    fetch("https://smas-ai-mk3u.onrender.com/query", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -66,7 +66,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // ==========================
   if (message.type === "CODE_QUERY") {
 
-    fetch("https://smas-ai.onrender.com/chat", {
+    fetch("https://smas-ai-mk3u.onrender.com/chat", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"
@@ -96,7 +96,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   // ==========================
   if (message.type === "RAG_INGEST") {
 
-    fetch("https://smas-ai.onrender.com/ingest", {
+    fetch("https://smas-ai-mk3u.onrender.com/ingest", {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

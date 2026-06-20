@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "SiteWhisper",
+  "name": "SmAs-AI",
   "version": "1.0",
   "description": "Ask questions about any webpage using AI",
 
@@ -20,7 +20,7 @@
 
   "host_permissions": [
     "<all_urls>",
-    "https://smas-ai.onrender.com/*"
+    "https://smas-ai-mk3u.onrender.com/*"
   ],
 
   "action": {

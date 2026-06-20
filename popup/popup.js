@@ -702,7 +702,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!key) { showError('No API key for this provider. Open Settings (⚙).'); return; }
 
         const isChat = selectedMode === 'chat';
-        const url = isChat ? 'http://127.0.0.1:8000/chat' : 'http://127.0.0.1:8000/rag';
+        const url = isChat ? 'http://smas-ai.onrender.com/chat' : 'http://smas-ai.onrender.com/rag';
         
         let response;
 
@@ -867,7 +867,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           let response;
           try {
-            response = await fetch('http://127.0.0.1:8000/code', {
+            response = await fetch('http://smas-ai.onrender.com/code', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json', 'Token': key, 'Provider': selectedProvider },
               body: JSON.stringify({
